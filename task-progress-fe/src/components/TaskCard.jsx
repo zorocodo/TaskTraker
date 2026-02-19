@@ -4,12 +4,15 @@ import ProgressChart from "./ProgressChart";
 
 export default function TaskCard({ task, onAddProgress }) {
   const [value, setValue] = useState("");
-
+  const chartData = task.progress_entries.map((entry) => ({
+    x: new Date(entry.created_at),
+    y: entry.progress_value,
+  }));
   return (
     <div className="task-card">
       <h3>{task.title}</h3>
 
-      <ProgressChart data={task.progress_history} />
+      <ProgressChart data={chartData} />
 
       <div className="progress-controls">
         <motion.button
