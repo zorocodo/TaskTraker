@@ -26,3 +26,15 @@ class ProgressEntry(models.Model):
 
     class Meta:
         ordering = ['created_at']
+
+
+class TaskStatus(models.Model):
+    class StatusChoices(models.TextChoices):
+        TODO = 'TODO', 'To Do'
+        IN_PROGRESS = 'IN_PROGRESS', 'In Progress'
+        BLOCKED = 'BLOCKED', 'Blocked'
+        DONE = 'DONE', 'Done'
+
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='task_status')
+    status = models.CharField(max_length=20,choices=StatusChoices.choices, default=StatusChoices.TODO)
+    updated_at = models.DateTimeField(auto_now=True)
