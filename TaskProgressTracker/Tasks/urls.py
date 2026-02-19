@@ -7,6 +7,7 @@ from .views.task_views import (
     UpdateTargetMaxAPI,
     UpdateTaskTitleAPI,
     UpdateTaskDescriptionAPI,
+    task_list_create
 )
 
 from .views.progress_views import (
@@ -20,6 +21,7 @@ from .views.status_views import (
 )
 
 urlpatterns = [
+    path('api/v1/tasks/', task_list_create, name='task-list-create'),
     path('api/v1/tasks/', CreateTaskAPI.as_view(), name='create-task'),
     path('api/v1/tasks/<int:task_id>/', GetTaskAPI.as_view(), name='get-task'),
 
