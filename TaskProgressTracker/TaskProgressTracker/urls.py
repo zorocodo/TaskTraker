@@ -46,7 +46,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # App APIs
-    path('', include('your_app.urls')),
+    path('', include('Tasks.urls')),
 
     # Swagger URLs
     path(
