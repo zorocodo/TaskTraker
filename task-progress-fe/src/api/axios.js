@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const url = import.meta.env.VITE_API_URL
+// console.log(url)
 const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api/v1", // Django base
+  baseURL: url,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
