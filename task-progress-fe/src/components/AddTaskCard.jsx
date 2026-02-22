@@ -8,7 +8,6 @@ export default function AddTaskCard({ isOpen, onClose, onSave }) {
     target_min: 1,
     target_max: 5,
   });
-
   const [errors, setErrors] = useState({});
 
   const validate = () => {
@@ -34,7 +33,7 @@ export default function AddTaskCard({ isOpen, onClose, onSave }) {
       id: Date.now(),
       ...form,
       created_at: new Date().toISOString(),
-      progress_history: [],
+      progress_entries: [],
     });
 
     setForm({ title: "", description: "", target_min: 1, target_max: 5 });

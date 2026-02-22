@@ -22,7 +22,7 @@ class SetProgressValueAPI(APIView):
             # validate progress_value vs target_min/max
             task = serializer.validated_data['task']
             value = serializer.validated_data['progress_value']
-
+            
             if not task.target_min <= value <= task.target_max:
                 return Response(
                     {"error": "Progress value out of task target range"},

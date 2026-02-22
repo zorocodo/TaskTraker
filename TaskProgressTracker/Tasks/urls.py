@@ -7,7 +7,8 @@ from .views.task_views import (
     UpdateTargetMaxAPI,
     UpdateTaskTitleAPI,
     UpdateTaskDescriptionAPI,
-    task_list_create
+    task_list_create,
+    DeleteTaskAPI,
 )
 
 from .views.progress_views import (
@@ -18,11 +19,12 @@ from .views.progress_views import (
 from .views.status_views import (
     GetTaskStatusAPI,
     UpdateTaskStatusAPI,
+    CreateTaskStatusAPI,
 )
 
 urlpatterns = [
     path('api/v1/tasks/', task_list_create, name='task-list-create'),
-    path('api/v1/tasks/', CreateTaskAPI.as_view(), name='create-task'),
+    path('api/v1/tasks/create/', CreateTaskAPI.as_view(), name='create-task'),
     path('api/v1/tasks/<int:task_id>/', GetTaskAPI.as_view(), name='get-task'),
 
     path('api/v1/tasks/<int:task_id>/target-min/', UpdateTargetMinAPI.as_view()),
@@ -33,6 +35,9 @@ urlpatterns = [
     path('api/v1/progress/', CreateProgressAPI.as_view()),
     path('api/v1/progress/set-value/', SetProgressValueAPI.as_view()),
 
+    path('api/v1/tasks/<int:task_id>/delete/', DeleteTaskAPI.as_view()),
+
     path('api/v1/tasks/<int:task_id>/status/', GetTaskStatusAPI.as_view()),
     path('api/v1/tasks/<int:task_id>/status/update/', UpdateTaskStatusAPI.as_view()),
+    path('api/v1/tasks/<int:task_id>/status/create/', CreateTaskStatusAPI.as_view()),
 ]

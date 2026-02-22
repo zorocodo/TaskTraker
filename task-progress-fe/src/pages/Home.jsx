@@ -45,7 +45,6 @@ import { useTasks } from "../hooks/useTasks";
 
 export default function Home() {
   const { tasks, createTask, addProgress } = useTasks();
-
   return (
     <div className="home">
       <div className="task-grid">

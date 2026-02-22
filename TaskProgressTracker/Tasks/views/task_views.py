@@ -4,16 +4,28 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from ..models import Task
-from ..serializers import TaskSerializer
+from ..serializers import TaskSerializer, ProgressEntry
 from ..services.task_service import validate_target_range
 
 
 class CreateTaskAPI(APIView):
     def post(self, request):
+        
         serializer = TaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         task = serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        # create initial progress
+        ProgressEntry.objects.create(
+            task=task,
+            percentage=0,
+            progress_value=0
+        )
+
+        # re-serialize so progress_entries is included
+        final_serializer = TaskSerializer(task)
+
+        return Response(final_serializer.data, status=status.HTTP_201_CREATED)  
 
 
 class UpdateTargetMinAPI(APIView):
@@ -65,16 +77,24 @@ class UpdateTaskDescriptionAPI(APIView):
         return Response({"message": "Description updated"})
 
 
-@api_view(['GET', 'POST'])
+class DeleteTaskAPI(APIView):
+    def put(self, request, task_id):
+        task = get_object_or_404(Task, id=task_id)
+        print(task)
+        task.delete()
+        return Response({"message": "Task Deleted"})
+    
+
+@api_view(['GET'])
 def task_list_create(request):
     if request.method == 'GET':
         tasks = Task.objects.all()
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 
-    if request.method == 'POST':
-        serializer = TaskSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # if request.method == 'POST':
+    #     serializer = TaskSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

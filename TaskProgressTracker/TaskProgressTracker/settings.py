@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
+# import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,10 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-cp)@i(@x_&!+hj39ammcmx$jw_5w4okr4y*bo@ef)u#c)q2@(y'
 
+# SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['zorojoro.pythonanywhere.com','127.0.0.1','localhost',]
 
 
 # Application definition
@@ -39,23 +41,19 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'Tasks',
-    'drf_yasg',
     'rest_framework',
+    'drf_spectacular',
     'corsheaders',
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ]
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -64,10 +62,15 @@ MIDDLEWARE = [
 ]
 
 # CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:5173",
+#     "https://task-traker-eta.vercel.app",
+# ]
+
+# CSRF_TRUSTED_ORIGINS = [
+#     "https://task-traker-eta.vercel.app",
 # ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+
 
 ROOT_URLCONF = 'TaskProgressTracker.urls'
 
@@ -99,6 +102,7 @@ DATABASES = {
     }
 }
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -134,4 +138,5 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'

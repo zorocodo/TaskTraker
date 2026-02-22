@@ -26,3 +26,12 @@ class GetTaskStatusAPI(APIView):
         )
         serializer = TaskStatusSerializer(status_obj)
         return Response(serializer.data)
+
+class CreateTaskStatusAPI(APIView):
+    def post(self, request, task_id):
+        task = Task.objects.get(id = task_id)
+        task_status_data = request.data['status']
+        task_status_obj = TaskStatus.objects.create(task = task, status= task_status_data)
+        serializer = TaskStatusSerializer(task_status_obj)
+        return Response(serializer.data)
+

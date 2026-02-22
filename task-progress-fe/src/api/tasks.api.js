@@ -4,7 +4,7 @@ export const TaskAPI = {
   getTasks: () => api.get("/tasks/"),
 
   createTask: (payload) =>
-    api.post("/tasks/", payload),
+    api.post("/tasks/create/", payload),
 
   updateTaskTitle: (id, title) =>
     api.put(`/tasks/${id}/title/`, { title }),
@@ -22,5 +22,5 @@ export const TaskAPI = {
     api.put(`/tasks/${id}/status/`, { status }),
 
   addProgress: (payload) =>
-    api.post("/progress/", payload),
+    api.post("/progress/set-value/", payload),
 };
