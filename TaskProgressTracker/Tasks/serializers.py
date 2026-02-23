@@ -5,7 +5,7 @@ from .models import Task, ProgressEntry, TaskStatus
 class ProgressEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = ProgressEntry
-        fields = '__all__'
+        fields = ["task", "progress_value", "percentage"]
 
 
 class TaskStatusSerializer(serializers.ModelSerializer):

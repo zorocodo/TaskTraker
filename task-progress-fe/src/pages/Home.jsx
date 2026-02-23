@@ -9,44 +9,17 @@ import AddTaskMorph from "../components/AddTaskMorph";
 import { useTasks } from "../hooks/useTasks";
 
 
-// export default function Home() {
-//   const [tasks, setTasks] = useState(mockTasks);
-//   const [showAdd, setShowAdd] = useState(false);
-
-//   const handleSaveTask = (task) => {
-//     setTasks((prev) => [...prev, task]);
-//   };
-
-//   return (
-//     <div className="home">
-//       <AnimatedBackground />
-
-//       {tasks.length === 0 ? (
-//         <EmptyState onAdd={() => setShowAdd(true)} />
-//       ) : (
-//         <div className="task-grid">
-//           {tasks.map((task) => (
-//             <TaskCard key={task.id} task={task} />
-//           ))}
-//         </div>
-//       )}
-
-//       <AddTaskMorph onSave={handleSaveTask} />
-
-//       <AddTaskCard
-//         isOpen={showAdd}
-//         onClose={() => setShowAdd(false)}
-//         onSave={handleSaveTask}
-//       />
-//     </div>
-//   );
-// }
-
-
 export default function Home() {
   const { tasks, createTask, addProgress } = useTasks();
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    window.location.href = "/login";
+  };
   return (
     <div className="home">
+      <button onClick={handleLogout}>Logout</button>
+      
       <div className="task-grid">
         {tasks.map((task) => (
           <TaskCard

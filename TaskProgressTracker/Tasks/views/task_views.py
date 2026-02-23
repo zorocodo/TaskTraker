@@ -1,100 +1,125 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from ..models import Task
-from ..serializers import TaskSerializer, ProgressEntry
+
+from ..models import Task, ProgressEntry
+from ..serializers import TaskSerializer, ProgressEntrySerializer
 from ..services.task_service import validate_target_range
 
 
+# -----------------------------
+# CREATE TASK
+# -----------------------------
 class CreateTaskAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        
         serializer = TaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        task = serializer.save()
+        task = serializer.save(user=request.user)
 
-        # create initial progress
+        # Create initial progress
         ProgressEntry.objects.create(
+            user=request.user,
             task=task,
             percentage=0,
             progress_value=0
         )
 
-        # re-serialize so progress_entries is included
+        # Re-serialize task to include any nested data
         final_serializer = TaskSerializer(task)
-
-        return Response(final_serializer.data, status=status.HTTP_201_CREATED)  
-
-
-class UpdateTargetMinAPI(APIView):
-    def put(self, request, task_id):
-        task = get_object_or_404(Task, id=task_id)
-        new_min = request.data['target_min']
-        validate_target_range(new_min, task.target_max)
-        task.target_min = new_min
-        task.save(update_fields=['target_min'])
-        return Response({"message": "target_min updated"})
+        return Response(final_serializer.data, status=status.HTTP_201_CREATED)
 
 
+# -----------------------------
+# GET SINGLE TASK
+# -----------------------------
 class GetTaskAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, task_id):
-        task = get_object_or_404(Task, id=task_id)
+        task = get_object_or_404(Task, id=task_id, user=request.user)
         serializer = TaskSerializer(task)
         return Response(serializer.data)
 
 
-class UpdateTargetMinAPI(APIView):
-    def put(self, request, task_id):
-        task = get_object_or_404(Task, id=task_id)
-        task.target_min = request.data.get('target_min', task.target_min)
-        task.save(update_fields=['target_min'])
-        return Response({"message": "Target min updated"})
-
-
-class UpdateTargetMaxAPI(APIView):
-    def put(self, request, task_id):
-        task = get_object_or_404(Task, id=task_id)
-        task.target_max = request.data.get('target_max', task.target_max)
-        task.save(update_fields=['target_max'])
-        return Response({"message": "Target max updated"})
-
-
+# -----------------------------
+# UPDATE TITLE
+# -----------------------------
 class UpdateTaskTitleAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
     def put(self, request, task_id):
-        task = get_object_or_404(Task, id=task_id)
+        task = get_object_or_404(Task, id=task_id, user=request.user)
         task.title = request.data.get('title', task.title)
         task.save(update_fields=['title'])
         return Response({"message": "Title updated"})
 
 
+# -----------------------------
+# UPDATE DESCRIPTION
+# -----------------------------
 class UpdateTaskDescriptionAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
     def put(self, request, task_id):
-        task = get_object_or_404(Task, id=task_id)
+        task = get_object_or_404(Task, id=task_id, user=request.user)
         task.description = request.data.get('description', task.description)
         task.save(update_fields=['description'])
         return Response({"message": "Description updated"})
 
 
-class DeleteTaskAPI(APIView):
+# -----------------------------
+# UPDATE TARGET MIN
+# -----------------------------
+class UpdateTargetMinAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
     def put(self, request, task_id):
-        task = get_object_or_404(Task, id=task_id)
-        print(task)
+        task = get_object_or_404(Task, id=task_id, user=request.user)
+        new_min = request.data.get('target_min', task.target_min)
+        validate_target_range(new_min, task.target_max)
+        task.target_min = new_min
+        task.save(update_fields=['target_min'])
+        return Response({"message": "Target min updated"})
+
+
+# -----------------------------
+# UPDATE TARGET MAX
+# -----------------------------
+class UpdateTargetMaxAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, task_id):
+        task = get_object_or_404(Task, id=task_id, user=request.user)
+        new_max = request.data.get('target_max', task.target_max)
+        validate_target_range(task.target_min, new_max)
+        task.target_max = new_max
+        task.save(update_fields=['target_max'])
+        return Response({"message": "Target max updated"})
+
+
+# -----------------------------
+# DELETE TASK
+# -----------------------------
+class DeleteTaskAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, task_id):
+        task = get_object_or_404(Task, id=task_id, user=request.user)
         task.delete()
-        return Response({"message": "Task Deleted"})
-    
+        return Response({"message": "Task Deleted"}, status=status.HTTP_204_NO_CONTENT)
 
+
+# -----------------------------
+# LIST TASKS
+# -----------------------------
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def task_list_create(request):
-    if request.method == 'GET':
-        tasks = Task.objects.all()
-        serializer = TaskSerializer(tasks, many=True)
-        return Response(serializer.data)
-
-    # if request.method == 'POST':
-    #     serializer = TaskSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    tasks = Task.objects.filter(user=request.user)
+    serializer = TaskSerializer(tasks, many=True)
+    return Response(serializer.data)
