@@ -22,6 +22,10 @@ from .views.status_views import (
     CreateTaskStatusAPI,
 )
 
+from .views.user_views import (
+    RegisterAPI,
+)
+
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -29,6 +33,8 @@ from rest_framework_simplejwt.views import (
 
 
 urlpatterns = [
+    path('api/v1/register/', RegisterAPI.as_view(), name='register'),
+
     path('api/v1/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/v1/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
